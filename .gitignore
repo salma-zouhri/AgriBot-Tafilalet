@@ -46,7 +46,12 @@ data/
 !data/
 data/*
 !data/disease_info.json
+!data/smart_irrigation.csv
 model/
+!model/
+model/*
+!model/leaf_disease_cnn.h5
+!model/irrigation_model.pkl
 archive/
 
 # Editor and IDE settings
