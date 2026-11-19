@@ -2,123 +2,166 @@
 
 ## Présentation
 
-AgriBot Tafilalet est une application web Flask conçue pour aider les producteurs de pommes dans l’analyse des maladies des feuilles et l’orientation de l’irrigation. L’application propose une interface accessible depuis un navigateur avec gestion des comptes utilisateurs, chatbot d’assistance agricole, analyse d’images, recommandations d’irrigation et historique des activités.
+AgriBot Tafilalet est une application web Flask destinée à aider les producteurs de pommes dans l’analyse des maladies des feuilles et la recommandation d’irrigation.
+
+Le dépôt contient :
+
+- le code source de l’application Flask ;
+- le modèle CNN `model/leaf_disease_cnn.h5` ;
+- le modèle d’irrigation `model/irrigation_model.pkl` ;
+- le dataset d’irrigation `data/smart_irrigation.csv` ;
+- les informations descriptives sur les maladies dans `data/disease_info.json`.
+
+Les images d’entraînement et de test PlantVillage situées dans `data/data_split/` ne sont pas incluses dans le dépôt.
 
 ## Fonctionnalités
 
 ### Classification des maladies des feuilles de pommier
 
-Les utilisateurs peuvent envoyer une image `.jpg`, `.jpeg` ou `.png` d’une feuille de pommier. L’application prétraite l’image, la transmet à un réseau neuronal convolutif (CNN) TensorFlow/Keras et renvoie l’une des quatre classes suivantes :
+L’utilisateur peut envoyer une image `.jpg`, `.jpeg` ou `.png` d’une feuille de pommier. L’application la prétraite puis utilise un réseau neuronal convolutif (CNN) TensorFlow/Keras pour produire une prédiction parmi quatre classes :
 
-- `Apple_scab`
-- `Black_rot`
-- `Cedar_apple_rust`
-- `Healthy`
+- `Apple_scab` ;
+- `Black_rot` ;
+- `Cedar_apple_rust` ;
+- `Healthy`.
 
-La réponse contient la classe prédite, une valeur de confiance et les informations correspondantes issues du fichier JSON des maladies : description, symptômes, causes, prévention et recommandation.
-
-L’endpoint de prédiction enregistre également l’image envoyée dans `static/uploads/` et peut enregistrer l’analyse dans l’historique de l’utilisateur authentifié.
+La réponse contient la classe prédite, une valeur de confiance ainsi que les informations correspondantes de `data/disease_info.json` : description, symptômes, causes, prévention et recommandation. L’image envoyée est enregistrée dans `static/uploads/`, qui reste exclu du dépôt.
 
 ### Chatbot agricole basé sur des règles
 
-Le chatbot n’est pas un système d’IA générative. Il utilise un ensemble fixe de règles fondées sur des mots-clés, implémentées dans Flask. Selon les mots présents dans le message de l’utilisateur, il renvoie des réponses prédéfinies concernant les salutations, l’analyse des maladies, l’irrigation, l’aide ou les remerciements. Les messages ne correspondant à aucune règle reçoivent une réponse prédéfinie de secours.
+Le chatbot n’est pas une IA générative. Il applique des règles fixes fondées sur des mots-clés et renvoie des réponses prédéfinies concernant les salutations, l’analyse des maladies, l’irrigation, l’aide et les remerciements. Un message de secours est utilisé lorsqu’aucune règle ne correspond.
 
 ### Recommandation d’irrigation
 
-L’endpoint `/irrigation` accepte quatre paramètres :
+L’endpoint `/irrigation` valide quatre paramètres :
 
 - l’humidité du sol : `Sec`, `Optimal` ou `Humide` ;
 - la température en degrés Celsius ;
 - l’humidité de l’air en pourcentage ;
-- le nombre de jours écoulés depuis la dernière irrigation.
+- le nombre de jours depuis la dernière irrigation.
 
-L’application valide les données et calcule un score d’irrigation à l’aide de règles fixes portant sur l’humidité du sol, la température, l’humidité de l’air et le temps écoulé. Le score détermine le niveau d’urgence, la quantité d’irrigation suggérée, le délai avant la prochaine vérification et des conseils supplémentaires. La route Flask actuelle utilise cette fonction de calcul heuristique ; elle n’appelle pas le modèle d’irrigation chargé au démarrage.
+La route Flask calcule ensuite un score heuristique à partir de ces valeurs. Ce score détermine le niveau d’urgence, la quantité d’irrigation suggérée, le délai avant la prochaine vérification et les conseils complémentaires.
 
-### Comptes, réinitialisation du mot de passe et historique
+Le fichier `model/irrigation_model.pkl` est présent dans le dépôt, mais le code actuel de l’endpoint `/irrigation` utilise la logique heuristique et n’appelle pas ce modèle pour produire sa recommandation.
+
+### Gestion des comptes et historique utilisateur
 
 L’application propose :
 
 - l’inscription et la connexion des utilisateurs ;
 - le hachage des mots de passe avec Werkzeug ;
-- la déconnexion et l’accès basé sur les sessions ;
-- des liens de réinitialisation du mot de passe valables une heure ;
-- l’envoi facultatif de courriels de réinitialisation via Gmail SMTP à l’aide de variables d’environnement ;
-- un historique par utilisateur des connexions, messages du chatbot, analyses d’images et demandes d’irrigation ;
-- la consultation et l’effacement de l’historique pour l’utilisateur authentifié.
+- la gestion des sessions et la déconnexion ;
+- la réinitialisation du mot de passe avec un lien valable une heure ;
+- l’envoi facultatif de courriels de réinitialisation via Gmail SMTP ;
+- l’enregistrement de l’historique des connexions, messages du chatbot, analyses d’images et demandes d’irrigation ;
+- la consultation et l’effacement de l’historique de l’utilisateur authentifié.
 
-Les comptes et l’historique sont stockés dans une base de données SQLite locale nommée `users.db`.
+Les comptes et l’historique sont stockés dans la base de données SQLite locale `users.db`, qui n’est pas publiée.
 
 ## Technologies
 
-- Python
-- Flask
-- Flask-CORS
-- TensorFlow / Keras
-- NumPy
-- Pillow, utilisé par le code de traitement des images
-- Joblib, utilisé pour charger le fichier du modèle d’irrigation
-- SQLite
-- Hachage des mots de passe avec Werkzeug
-- Modules de la bibliothèque standard Python pour les journaux, les sessions, les courriels et la validation
+- Python ;
+- Flask ;
+- Flask-CORS ;
+- TensorFlow / Keras pour la classification CNN ;
+- NumPy ;
+- Pillow pour le traitement des images ;
+- Joblib pour le chargement du modèle d’irrigation ;
+- SQLite pour les comptes et l’historique ;
+- Werkzeug pour le hachage des mots de passe ;
+- `python-dotenv` pour le chargement du fichier `.env` ;
+- modules de la bibliothèque standard Python pour les sessions, journaux, courriels et validations.
 
-Le fichier actuel `requirements.txt` déclare Flask, Flask-CORS, Joblib, TensorFlow, NumPy, Werkzeug, Flask-Mail et PyJWT. Le code source importe également `python-dotenv` et Pillow. Les scripts d’entraînement importent en plus pandas et scikit-learn. Ces déclarations de dépendances doivent être vérifiées avant toute installation propre.
+Le fichier `requirements.txt` déclare également Flask-Mail et PyJWT. Les scripts d’entraînement utilisent en outre pandas et scikit-learn. Ces dépendances doivent être vérifiées dans l’environnement utilisé.
+
+## Architecture du projet
+
+```text
+.
+├── app.py                         # Application Flask, routes et logique métier
+├── predict.py                     # Chargement du CNN et prédiction des maladies
+├── model/
+│   ├── leaf_disease_cnn.h5        # Modèle CNN publié
+│   └── irrigation_model.pkl       # Modèle d’irrigation publié, non utilisé par la route actuelle
+├── data/
+│   ├── disease_info.json          # Informations sur les maladies publiées
+│   └── smart_irrigation.csv       # Dataset d’irrigation publié
+├── templates/                     # Pages HTML de l’application
+├── static/                        # Ressources statiques et dossier local d’uploads
+├── scripts/                       # Scripts utilitaires
+├── traning/                       # Scripts d’entraînement et de préparation des modèles
+├── requirements.txt               # Dépendances déclarées
+└── README.md
+```
+
+Le dossier `data/data_split/`, qui contient les images PlantVillage d’entraînement, de validation et de test, n’est pas inclus dans le dépôt.
 
 ## Installation
 
-1. Utiliser un environnement Python compatible.
-2. Créer et activer un environnement virtuel, par exemple :
+### Cloner le dépôt
 
-   ```bash
-   python -m venv venv
-   ```
+Depuis un terminal, exécuter :
 
-   Sous Windows :
+```bash
+git clone https://github.com/salma-zouhri/AgriBot-Tafilalet.git
+cd AgriBot-Tafilalet
+```
 
-   ```powershell
-   venv\\Scripts\\activate
-   ```
+### Créer et activer un environnement virtuel sous Windows
 
-3. Installer les dépendances déclarées par le projet :
+```powershell
+python -m venv venv
+venv\Scripts\activate
+```
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Installer les dépendances
 
-4. Avant de lancer l’application dans un environnement propre, s’assurer que les paquets supplémentaires importés par le code source (`python-dotenv` et Pillow) sont disponibles. Les scripts d’entraînement nécessitent également pandas et scikit-learn s’ils doivent être utilisés.
+```powershell
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-5. Fournir séparément les fichiers de modèles et de données nécessaires. Ils sont volontairement exclus de la publication GitHub par `.gitignore` et ne sont pas fournis dans cette préparation du dépôt :
+```powershell
+pip install python-dotenv Pillow
+```
 
-   - `model/leaf_disease_cnn.h5`
-   - `model/irrigation_model.pkl`
-   - `data/disease_info.json`
+Le code source importe également `python-dotenv` et Pillow, qui ne figurent pas dans le `requirements.txt` actuel. Dans un environnement propre, vérifier qu’ils sont disponibles avant le lancement. Les scripts d’entraînement nécessitent aussi pandas et scikit-learn s’ils sont utilisés.
 
 ## Configuration
 
-Créer un fichier `.env` local pour les valeurs propres à l’environnement. Ne pas le versionner. L’application lit les variables suivantes :
+Créer à la racine du projet un fichier local `.env`. Ne pas le publier. Les variables utilisées par l’application sont :
 
-- `SECRET_KEY` pour les sessions Flask ;
-- `GMAIL_USER` pour l’envoi des courriels de réinitialisation ;
-- `GMAIL_APP_PASSWORD` pour le mot de passe d’application Gmail utilisé par SMTP ;
-- `PORT` pour remplacer le port par défaut.
+```dotenv
+SECRET_KEY=remplacer_par_une_valeur_secrete
+GMAIL_USER=adresse Gmail utilisée pour les courriels
+GMAIL_APP_PASSWORD=mot_de_passe_d_application_Gmail
+PORT=5000
+```
 
-L’application utilise par défaut le port `5000`, écoute sur `0.0.0.0` et démarre avec le mode debug Flask activé dans le code source actuel. Cette configuration doit être revue avant un déploiement en production.
+`SECRET_KEY` sert aux sessions Flask. `GMAIL_USER` et `GMAIL_APP_PASSWORD` sont utilisés pour l’envoi des courriels de réinitialisation. `PORT` permet de remplacer le port par défaut `5000`.
+
+L’application écoute sur `0.0.0.0` et le code source actuel active le mode debug Flask. Cette configuration doit être revue avant tout déploiement en production. Le projet n’est pas présenté comme déployé en production.
 
 ## Lancement
 
-Depuis la racine du projet, exécuter :
+Depuis la racine du dépôt et avec l’environnement virtuel activé, exécuter :
 
-```bash
+```powershell
 python app.py
 ```
 
-Au démarrage, l’application initialise `users.db` si nécessaire, charge le modèle d’irrigation lorsque son fichier est disponible et charge le CNN ainsi que les informations sur les maladies lors de l’importation du module de prédiction. Ouvrir ensuite l’adresse de l’application dans un navigateur.
+L’application initialise `users.db` si nécessaire et utilise le port `5000` par défaut, sauf si `PORT` est défini dans l’environnement. Ouvrir ensuite l’adresse locale de l’application dans un navigateur.
 
 ## Périmètre de publication
 
-Cette préparation du dépôt ne publie pas les modèles locaux, les datasets, les bases de données SQLite, les images envoyées, les secrets, les environnements virtuels ni les fichiers d’archive. La propriété, les licences des sources, les conditions de redistribution et les éventuelles implications liées à la vie privée doivent être vérifiées séparément avant toute distribution.
+Les modèles `model/leaf_disease_cnn.h5` et `model/irrigation_model.pkl`, le dataset `data/smart_irrigation.csv` et le fichier `data/disease_info.json` font partie du contenu publié du dépôt.
 
-Le fichier `data/disease_info.json` est le seul fichier du dossier `data/` actuellement autorisé à être suivi par Git. Son contenu et ses droits de redistribution doivent être vérifiés avant publication.
+Les éléments suivants restent exclus de la publication :
 
-## État du projet
+- les images PlantVillage d’entraînement, de validation et de test de `data/data_split/` ;
+- les images envoyées dans `static/uploads/` ;
+- le fichier `.env` et les autres secrets ;
+- les bases de données SQLite et leurs sauvegardes ;
+- les environnements virtuels, caches Python et fichiers de sauvegarde.
 
-AgriBot Tafilalet est une application Flask spécifique à ce projet. Ce README décrit le comportement actuellement implémenté dans le code source et ne revendique aucune métrique de performance ni fonctionnalité absente du projet.
+Les droits d’utilisation et de redistribution du dataset d’irrigation, des informations sur les maladies et des modèles publiés doivent être vérifiés séparément. Ce README ne revendique aucune métrique de performance et ne présente pas l’application comme déployée en production.
