@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique - AgriBot Tafilalet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .history-container {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .history-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .history-item:hover {
+            transform: translateY(-2px);
+            border-left-color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .btn-refresh {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-link {
+            transition: all 0.2s ease;
+        }
+        
+        .back-link:hover {
+            color: #2E7D32;
+            text-decoration: underline;
+        }
+        
+        .logo-leaf {
+            color: #4CAF50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header with AgriBot styling -->
+            <div class="history-container rounded-xl shadow-2xl overflow-hidden border border-green-100 mb-8">
+                <div class="bg-gradient-to-r from-green-600 to-green-700 p-4 text-center">
+                    <div class="flex flex-col items-center">
+                        <img src="{{ url_for('static', filename='ormvatf.jpg') }}" alt="Logo" class="h-12">
+                        <h1 class="text-xl font-bold text-white mt-2">AgriBot Tafilalet</h1>
+                    </div>
+                    <p class="text-green-100 text-sm mt-1">Historique des actions</p>
+                </div>
+
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <a href="javascript:history.back()" class="back-link flex items-center text-green-600">
+                        <i class="fas fa-arrow-left mr-1"></i>
+                        <span>Retour</span>
+                    </a>
+                    <button onclick="loadHistory()" class="btn-refresh flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-sync-alt mr-1"></i>
+                        <span>Rafraîchir</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Content -->
+            <div class="history-container rounded-xl shadow-2xl overflow-hidden border border-green-100">
+                <div id="history-content" class="p-6">
+                    <div class="flex items-center justify-center py-12">
+                        <div class="animate-pulse flex space-x-4">
+                            <i class="fas fa-spinner fa-spin text-green-500 text-xl"></i>
+                            <span class="text-gray-600">Chargement de l'historique...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       async function loadHistory() {
+        try {
+            // Affiche l'état de chargement
+            let container = document.getElementById("history-content");
+            container.innerHTML = `
+                <div class="flex items-center justify-center py-12">
+                    <div class="animate-pulse flex space-x-4">
+                        <i class="fas fa-spinner fa-spin text-green-500 text-xl"></i>
+                        <span class="text-gray-600">Chargement de l'historique...</span>
+                    </div>
+                </div>
+            `;
+
+            // Requête vers l'API
+            let response = await fetch("/history/data");
+            if (!response.ok) {
+                // Si 401 -> non authentifié, on peut rediriger vers login ou afficher message
+                if (response.status === 401) {
+                    container.innerHTML = `
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <p class="text-sm text-yellow-700">Vous n'êtes pas authentifié. Veuillez vous connecter.</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error("Erreur HTTP " + response.status);
+                }
+                return;
+            }
+
+            let data = await response.json();
+
+            // Clear container
+            container.innerHTML = "";
+
+            // Si l'API renvoie une erreur
+            if (data.error) {
+                container.innerHTML = `
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+                            <p class="text-sm text-red-700">${data.error}</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Vérifier que la clé 'history' existe et est un tableau
+            const historyArray = Array.isArray(data.history) ? data.history : [];
+
+            if (historyArray.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-inbox text-gray-400 text-4xl mb-3"></i>
+                        <h3 class="text-sm font-medium text-gray-900">Aucune entrée d'historique</h3>
+                        <p class="mt-1 text-sm text-gray-600">Vos actions apparaîtront ici.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let historyItems = document.createElement('div');
+            historyItems.className = 'divide-y divide-green-100';
+
+            historyArray.forEach((item, index) => {
+                let div = document.createElement("div");
+                div.className = "history-item py-4 px-4";
+                div.setAttribute('data-aos', 'fade-up');
+                div.setAttribute('data-aos-delay', index * 50);
+
+                // protège contre created_at undefined
+                let dateText = item.created_at || "";
+                let formattedDate = dateText;
+                try {
+                    let date = new Date(dateText);
+                    if (!isNaN(date.getTime())) {
+                        formattedDate = date.toLocaleDateString('fr-FR', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    }
+                } catch (e) {
+                    // laisse formattedDate tel quel
+                }
+
+                div.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0 bg-green-100 p-2 rounded-full">
+                            <i class="fas fa-seedling text-green-600"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">${item.action || 'Action inconnue'}</p>
+                            <p class="text-xs text-gray-500 mt-1">${formattedDate}</p>
+                        </div>
+                    </div>
+                `;
+                historyItems.appendChild(div);
+            });
+
+            container.appendChild(historyItems);
+            AOS.init();
+
+        } catch (err) {
+            document.getElementById("history-content").innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-red-700">Erreur de chargement</p>
+                            <p class="text-sm text-red-700">${err.message}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            console.error("Erreur loadHistory:", err);
+        }
+    }
+
+    window.onload = function() {
+        loadHistory();
+        AOS.init();
+    };
+    </script>
+</body>
+</html>

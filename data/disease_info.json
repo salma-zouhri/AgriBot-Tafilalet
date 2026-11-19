@@ -1,0 +1,34 @@
+{
+  "Apple_scab": {
+    "nom": "Tavelure du pommier",
+    "description": "La tavelure est une maladie fongique causée par Venturia inaequalis qui affecte principalement les feuilles et les fruits des pommiers.",
+    "symptomes": "Apparition de taches brun-olive à noires sur les feuilles, les fruits peuvent se déformer ou craqueler.",
+    "causes": "Humidité élevée, mauvaises pratiques de taille, feuilles infectées non ramassées.",
+    "prevention": "Élaguer pour améliorer la circulation de l'air, éviter les arrosages excessifs, choisir des variétés résistantes.",
+    "recommandation": "Appliquer des fongicides en début de saison (printemps), ramasser les feuilles mortes et les fruits tombés pour éviter la propagation."
+  },
+  "Black_rot": {
+    "nom": "Pourriture noire",
+    "description": "Maladie causée par le champignon Botryosphaeria obtusa, affectant les feuilles, les branches et les fruits.",
+    "symptomes": "Taches pourpres avec des anneaux concentriques sur les feuilles, fruits momifiés, chancres sur les branches.",
+    "causes": "Blessures sur l'arbre, humidité persistante, présence de bois mort ou de fruits infectés.",
+    "prevention": "Éliminer les débris végétaux, désinfecter les outils de taille, éviter les blessures à l’arbre.",
+    "recommandation": "Tailler les branches infectées, brûler les fruits atteints, utiliser un fongicide préventif au printemps."
+  },
+  "Cedar_apple_rust": {
+    "nom": "Rouille cèdre-pommier",
+    "description": "Maladie causée par Gymnosporangium juniperi-virginianae, affectant les pommiers et les genévriers (cycle de vie à deux hôtes).",
+    "symptomes": "Taches orange à rouge sur les feuilles, formations en forme de galle sur les genévriers.",
+    "causes": "Proximité de genévriers infectés, humidité élevée pendant le printemps.",
+    "prevention": "Planter les pommiers loin des genévriers, surveiller les hôtes intermédiaires.",
+    "recommandation": "Retirer les galles sur les genévriers, utiliser un fongicide spécifique au moment de la floraison."
+  },
+  "Healthy": {
+    "nom": "Feuille saine",
+    "description": "Aucun signe de maladie détecté. La plante semble en bonne santé.",
+    "symptomes": "Feuilles vertes uniformes, sans taches ni déformations.",
+    "causes": "Bon entretien, environnement sain, absence de pathogènes.",
+    "prevention": "Continuer les bonnes pratiques : irrigation adaptée, fertilisation équilibrée, surveillance régulière.",
+    "recommandation": "Maintenir les soins actuels, surveiller les conditions climatiques et les nuisibles éventuels."
+  }
+}

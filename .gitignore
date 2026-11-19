@@ -1,0 +1,60 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*secret*
+*credentials*
+
+# Local databases and backups
+*.db
+*.sqlite
+*.sqlite3
+*.db.bak
+*.sqlite.bak
+
+# Python virtual environments
+venv/
+cnn_env/
+.venv/
+env/
+
+# Python caches and temporary files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# User-uploaded files
+static/uploads/
+
+# Local, generated, or sensitive project assets
+data/
+!data/
+data/*
+!data/disease_info.json
+model/
+archive/
+
+# Editor and IDE settings
+.vscode/
+.idea/
+
+# Backup and editor files
+*.bak
+*.backup
+*~
+app.py.bak

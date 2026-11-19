@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - AgriBot Tafilalet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .register-container {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .logo-leaf {
+            color: #4CAF50;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        
+        .btn-register {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .error-message {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .success-message {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .password-strength {
+            height: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: #4CAF50;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="register-container w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-green-100">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 p-6 text-center">
+            <div class="flex flex-col items-center mb-4">
+                <i class="fas fa-robot text-5xl text-white mb-2"></i>
+                <h1 class="text-3xl font-bold text-white mt-2">AgriBot Tafilalet</h1>
+            </div>
+            <p class="text-green-100 font-medium">Votre assistant agricole intelligent</p>
+        </div>
+        
+        <div class="px-8 py-6">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-6">Créer un compte</h2>
+            
+            <form id="registerForm" action="{{ url_for('register') }}" method="POST" class="space-y-5">
+
+                <div id="errorMessage" class="error-message hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+                    <p id="errorText"></p>
+                </div>
+                
+                <div id="successMessage" class="success-message hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
+                    <p>Inscription réussie ! Bienvenue sur AgriBot  🌱</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="username" class="block text-sm font-medium text-gray-700">
+                        <i class="fas fa-user mr-2 text-green-600"></i>Nom d'utilisateur
+                    </label>
+                    <div class="relative">
+                        <input type="text" id="username" name="username"
+                                class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-green-500 focus:outline-none pl-10"
+                                placeholder="Choisissez un nom d'utilisateur" required>
+                        <i class="fas fa-user absolute left-3 top-3.5 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700">
+                        <i class="fas fa-envelope mr-2 text-green-600"></i>Adresse email
+                    </label>
+                    <div class="relative">
+                        <input type="email" id="email" name="email"
+                                class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-green-500 focus:outline-none pl-10"
+                                placeholder="Entrez votre email" required>
+                        <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="password" class="block text-sm font-medium text-gray-700">
+                        <i class="fas fa-lock mr-2 text-green-600"></i>Mot de passe
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password"
+                                class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-green-500 focus:outline-none pl-10 pr-10"
+                                placeholder="Créez un mot de passe" required>
+                        <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                        <i id="togglePassword" class="fas fa-eye absolute right-3 top-3.5 text-gray-400 password-toggle"></i>
+                    </div>
+                    <div class="flex mt-1 space-x-1">
+                        <div id="strength1" class="password-strength w-1/4 bg-gray-200 rounded-full"></div>
+                        <div id="strength2" class="password-strength w-1/4 bg-gray-200 rounded-full"></div>
+                        <div id="strength3" class="password-strength w-1/4 bg-gray-200 rounded-full"></div>
+                        <div id="strength4" class="password-strength w-1/4 bg-gray-200 rounded-full"></div>
+                    </div>
+                    <p id="passwordHint" class="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 8 caractères</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+                        <i class="fas fa-lock mr-2 text-green-600"></i>Confirmer le mot de passe
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                                class="input-field w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-green-500 focus:outline-none pl-10 pr-10"
+                                placeholder="Confirmez votre mot de passe" required>
+                        <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                        <i id="toggleConfirmPassword" class="fas fa-eye absolute right-3 top-3.5 text-gray-400 password-toggle"></i>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded" required>
+                    <label for="terms" class="ml-2 block text-sm text-gray-700">
+                        J'accepte les <a href="#" class="font-medium text-green-600 hover:text-green-500">conditions d'utilisation</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-register w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-user-plus mr-2"></i>S'inscrire
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Déjà inscrit ? 
+                    <a href="{{ url_for('show_login') }}" class="font-medium text-green-600 hover:text-green-500">Connectez-vous</a>
+                </p>
+            </div>
+        </div>
+        
+        <div class="bg-green-50 px-8 py-4 border-t border-green-100 text-center">
+            <p class="text-xs text-gray-500">&copy; 2025 AgriBot Tafilalet. Tous droits réservés.</p>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Toggle confirm password visibility
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        // Password strength indicator
+        password.addEventListener('input', function() {
+            const strengthBars = [
+                document.getElementById('strength1'),
+                document.getElementById('strength2'),
+                document.getElementById('strength3'),
+                document.getElementById('strength4')
+            ];
+            const hint = document.getElementById('passwordHint');
+            
+            // Reset all bars
+            strengthBars.forEach(bar => {
+                bar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+                bar.classList.add('bg-gray-200');
+            });
+            
+            const value = password.value;
+            let strength = 0;
+            
+            // Check length
+            if (value.length >= 8) strength++;
+            if (value.length >= 12) strength++;
+            
+            // Check for numbers
+            if (/\d/.test(value)) strength++;
+            
+            // Check for special characters
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) strength++;
+            
+            // Update bars and hint
+            if (value.length > 0) {
+                let color, message;
+                
+                if (strength <= 1) {
+                    color = 'bg-red-500';
+                    message = 'Mot de passe faible';
+                } else if (strength <= 2) {
+                    color = 'bg-yellow-500';
+                    message = 'Mot de passe moyen';
+                } else {
+                    color = 'bg-green-500';
+                    message = 'Mot de passe fort';
+                }
+                
+                for (let i = 0; i < strength; i++) {
+                    strengthBars[i].classList.remove('bg-gray-200');
+                    strengthBars[i].classList.add(color);
+                }
+                
+                hint.textContent = message;
+                hint.className = 'text-xs mt-1 ' + 
+                    (color === 'bg-red-500' ? 'text-red-500' : 
+                     color === 'bg-yellow-500' ? 'text-yellow-600' : 'text-green-600');
+            } else {
+                hint.textContent = 'Le mot de passe doit contenir au moins 8 caractères';
+                hint.className = 'text-xs text-gray-500 mt-1';
+            }
+        });
+        
+        // Form validation
+     document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("{{ url_for('register') }}", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url; // Flask renverra vers index ou login
+        } else if (response.status === 409) {
+            document.getElementById('errorText').textContent = "Nom d'utilisateur ou email déjà utilisé";
+            document.getElementById('errorMessage').classList.remove('hidden');
+        } else if (!response.ok) {
+            document.getElementById('errorText').textContent = "Erreur lors de l'inscription";
+            document.getElementById('errorMessage').classList.remove('hidden');
+        }
+    })
+    .catch(err => {
+        document.getElementById('errorText').textContent = "Erreur réseau";
+        document.getElementById('errorMessage').classList.remove('hidden');
+        const form = document.getElementById('registerForm');
+form.classList.add('animate-shake');
+setTimeout(() => form.classList.remove('animate-shake'), 500);
+
+    });
+});
+
+            
+           
+        // Add shake animation to CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            .animate-shake {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
